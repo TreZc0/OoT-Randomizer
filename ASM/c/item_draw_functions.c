@@ -812,20 +812,28 @@ void draw_gi_flame(z64_disp_buf_t* dl, z64_game_t *game, colorRGBA8_t prim, colo
 
 void draw_gi_xlu_with_flame(z64_game_t* game, uint32_t draw_id) {
     z64_gfx_t *gfx = game->common.gfx;
+    // Rainbow smoke effect
+    colorRGBA8_t rainbow_color;
+    rainbow_color.a = 0xFF;
+    rainbow_color.color = get_rainbow_color(game->gameplay_frames, 10);
 
     z64_xyzf_t translation = { .x = 0, .y = -35.0f, .z = 0.0f };
     z64_xyzf_t scale = { .x = .0125f, .y = .0075f, .z = .01f };
-    draw_gi_flame(&gfx->poly_xlu, game, item_draw_table[draw_id].args[1].color, item_draw_table[draw_id].args[2].color, translation, scale);
+    draw_gi_flame(&gfx->poly_xlu, game, rainbow_color, rainbow_color, translation, scale);
 
     draw_gi_various_xlu0(game, draw_id);
 }
 
 void draw_gi_deku_nut_with_flame(z64_game_t* game, uint32_t draw_id) {
     z64_gfx_t *gfx = game->common.gfx;
+    // Rainbow smoke effect
+    colorRGBA8_t rainbow_color;
+    rainbow_color.a = 0xFF;
+    rainbow_color.color = get_rainbow_color(game->gameplay_frames, 10);
 
     z64_xyzf_t translation = { .x = 0, .y = -35.0f, .z = -10.0f };
     z64_xyzf_t scale = { .x = .0125f, .y = .0075f, .z = .01f };
-    draw_gi_flame(&gfx->poly_xlu, game, item_draw_table[draw_id].args[1].color, item_draw_table[draw_id].args[2].color, translation, scale);
+    draw_gi_flame(&gfx->poly_xlu, game, rainbow_color, rainbow_color, translation, scale);
 
     draw_gi_deku_nut(game, draw_id);
 }
