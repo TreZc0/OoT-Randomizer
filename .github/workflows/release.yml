@@ -72,12 +72,13 @@ jobs:
       - name: Swap package files
         run: |
           cd GUI
+          rm package.json
           mv package_release.json package.json
 
       - name: Install npm dependencies
         run: |
           cd GUI
-          npm install
+          npm install --no-audit
 
       - name: Build Angular in production mode
         run: |
