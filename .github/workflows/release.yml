@@ -48,7 +48,8 @@ jobs:
       - name: Generate settings JSON
         run: python SettingsToJson.py
 
-      - name: Prepare GUI directory structure
+      - name: Prepare GUI directory structure (Unix)
+        if: runner.os != 'Windows'
         run: |
           # Create python subdirectory in GUI
           mkdir -p GUI/python
@@ -58,6 +59,15 @@ jobs:
               mv "$item" GUI/python/
             fi
           done
+
+      - name: Prepare GUI directory structure (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          # Create python subdirectory in GUI
+          New-Item -ItemType Directory -Path "GUI\python" -Force
+          # Move all files and folders except GUI to the python subdirectory
+          Get-ChildItem -Path . -Exclude "GUI", ".git", ".github" | Move-Item -Destination "GUI\python\"
 
       - name: Swap package files
         run: |
