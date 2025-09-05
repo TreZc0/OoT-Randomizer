@@ -1,0 +1,122 @@
+name: Release Build
+
+jobs:
+  build-and-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact-name: linux
+          - os: windows-latest
+            platform: win32
+            artifact-name: windows
+          - os: macos-latest
+            platform: darwin
+            artifact-name: macos
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+        cache: 'npm'
+        cache-dependency-path: GUI/package-lock.json
+
+    - name: Extract version
+      id: version
+      run: |
+        python -c "import sys; sys.path.append('.'); from version import __version__; print('version=' + __version__)" >> $GITHUB_OUTPUT
+        echo "version_clean=$(python -c "import sys; sys.path.append('.'); from version import __version__; print(__version__.split()[0])")" >> $GITHUB_OUTPUT
+
+    - name: Generate settings JSON
+      run: python SettingsToJson.py
+
+    - name: Prepare GUI directory structure
+      run: |
+        # Create python subdirectory in GUI
+        mkdir -p GUI/python
+        
+        # Move all files and folders except GUI to the python subdirectory
+        for item in *; do
+          if [ "$item" != "GUI" ] && [ "$item" != ".git" ] && [ "$item" != ".github" ]; then
+            mv "$item" GUI/python/
+          fi
+        done
+
+    - name: Swap package files
+      run: |
+        cd GUI
+        mv package_release.json package.json
+
+    - name: Install npm dependencies
+      run: |
+        cd GUI
+        npm install
+
+    - name: Build Angular in production mode
+      run: |
+        cd GUI
+        npm run ng-prod
+
+    - name: Build Electron installer
+      run: |
+        cd GUI
+        npm run dist
+
+    - name: Upload Windows artifacts
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: oot-randomizer-windows-${{ steps.version.outputs.version_clean }}
+        path: GUI/installer/*.exe
+        retention-days: 30
+
+    - name: Upload macOS artifacts
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: oot-randomizer-macos-${{ steps.version.outputs.version_clean }}
+        path: GUI/installer/*.dmg
+        retention-days: 30
+
+    - name: Upload Linux artifacts
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: oot-randomizer-linux-${{ steps.version.outputs.version_clean }}
+        path: GUI/installer/*.tar.gz
+        retention-days: 30
+
+    - name: Create Release
+      if: matrix.os == 'ubuntu-latest'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: OoT Randomizer ${{ steps.version.outputs.version }}
+        body: |
+          Release ${{ steps.version.outputs.version }} of Ocarina of Time Randomizer
+          
+          **Downloads:**
+          - Windows: Download the Windows artifact
+          - macOS: Download the macOS artifact  
+          - Linux: Download the Linux artifact
+        files: |
+          GUI/installer/*.exe
+          GUI/installer/*.dmg
+          GUI/installer/*.tar.gz
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+

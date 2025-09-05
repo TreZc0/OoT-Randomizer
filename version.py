@@ -14,4 +14,4 @@ branch_url = 'https://github.com/OoTRandomizer/OoT-Randomizer/tree/rc'
 base_version = __version__
 
 # And finally, the completed version string. This is what is displayed and used for salting seeds.
-__version__ = f'{base_version} RC {supplementary_version}'
+__version__ = f'{base_version} Release'
