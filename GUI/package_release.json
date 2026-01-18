@@ -75,12 +75,18 @@
       "executableName": "oot-randomizer-gui"
     },
     "mac": {
-      "target": "dmg",
-      "category": "public.app-category.utilities"
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ]
     }
   },
   "engines": {
-    "node": ">=14.15.0 <=21"
+    "node": ">=14.15.0 <=22"
   },
   "dependencies": {
     "@electron/remote": "^2.0.8",
