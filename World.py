@@ -399,7 +399,6 @@ class World:
             dist_keys = self.distribution.distribution.src_dict['_settings'].keys()
         if self.settings.randomize_settings:
             setting_info = SettingInfos.setting_infos['randomize_settings']
-            self.randomized_list.extend(setting_info.disable[True]['settings'])
             for section in setting_info.disable[True]['sections']:
                 self.randomized_list.extend(get_settings_from_section(section))
                 # Remove settings specified in the distribution

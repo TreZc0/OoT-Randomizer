@@ -1,5 +1,7 @@
 # Dev
 
+# 8.3
+
 ## New Settings and Options
 * New options `Custom (count)` and `Custom (%)` for the `Ice Traps` setting.
 * New hidden `plandomized_locations` setting to allow presets to place specific items at specific locations.
